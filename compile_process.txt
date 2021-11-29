@@ -67,7 +67,7 @@ x           identifier
 =           symbol
 x2          identifier
 ;           semicolon
-			.
+
 x2          identifier
 =           symbol
 x3          identifier
