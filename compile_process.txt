@@ -1,0 +1,189 @@
+STEP 1: SOURCE CODE
+------------------------------------------------------------
+
+var x = 1;
+var x2 = 1;
+
+var i = 0;
+while (i < 20)
+{
+	i = i + 1;
+	var x3 = x2 + x;
+	x = x2;
+	x2 = x3;
+	print(x3);
+}
+
+
+
+STEP 2: TOKENS
+------------------------------------------------------------
+
+TOKEN		TYPE
+
+var			keyword
+x           identifier
+=           symbol
+1           literal
+;           semicolon
+
+var         keyword
+x2          identifier
+=           symbol
+1           literal
+;           semicolon
+
+var         keyword
+i           identifier
+=           symbol
+0           literal
+;           semicolon
+
+while       keyword
+(           symbol
+i           identifier
+<           symbol
+20          literal
+)           symbol
+
+{           symbol
+
+i           identifier
+=           symbol
+i           identifier
++           symbol
+1           literal
+;           semicolon
+
+var         keyword
+x3          identifier
+=           symbol
+x2          identifier
++           symbol
+x           identifier
+;           semicolon
+
+x           identifier
+=           symbol
+x2          identifier
+;           semicolon
+			.
+x2          identifier
+=           symbol
+x3          identifier
+;           semicolon
+
+print       identifier
+(           symbol
+x3          identifier
+)           symbol
+;           semicolon
+
+}           symbol
+
+
+
+STEP 3: AST (Abstract Syntax Tree)
+------------------------------------------------------------
+
+TYPE			VALUE
+
+root			sequence
+statement			assignment
+destination				var x
+expression				1
+statement			assignment
+destination				var x2
+expression				1
+statement			while
+condition				compare-less-than
+lhs							var i
+rhs							20
+body					sequence
+statement					assignment
+destination						var i
+expression						addition
+lhs									var i
+rhs									1
+statement					assignment
+destination						var x3
+expression						addition
+lhs									var x2
+rhs									var x
+statement					assignment
+destination						var x
+expression						var x2
+statement					assignment
+destination						var x2
+expression						var x3
+statement					"function call"
+function						print
+arguments						arguments
+expression							var x3
+
+
+
+STEP 4: INSTRUCTIONS (Virtual-Machine Code)
+------------------------------------------------------------
+
+OPCODE	PARAMETER	ORIGIN
+
+push	1			var x = 1
+push	1			var x2 = 1
+
+push	0			var i = 0
+load	0			while(i < 20)
+push	20
+lt
+jz		12
+push	1			i = i + 1
+add
+load	1			var x3 = x2 + x
+load	3
+add
+load	2			x = x2
+str		4
+load	0			x2 = x3
+str		3
+cout				print(x3)
+jmp		-14			while (i < 20)
+
+stop
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------
+register [a],[b],[c],[d]
+mov <dst>, <constant>
+lt <lhs>, <rhs>
+mov <dst>
+	from stack
+add <op1>, <op2>
+	-> [a]
+push <src|constant>
+pop <dst>
+-------------------------------
+mov b, 1		var x = 1
+mov c, 1		var x2 = 1
+mov d, 0		var i = 0
+:loop
+lt d, 20		while (i < 20)
+jz exit
+add d, 1		i = i + 1
+mov d, a
+add c, b		var x3 = x2 + x
+mov b, c		x = x2
+mov c, a		x2 = x3
+push c			print(x3)
+cout
+jmp loop
+:exit
+stop
