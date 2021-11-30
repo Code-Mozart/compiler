@@ -1,4 +1,4 @@
-STEP 1: SOURCE CODE
+FORM 1: SOURCE CODE
 ------------------------------------------------------------
 
 var x = 1;
@@ -16,74 +16,74 @@ while (i < 20)
 
 
 
-STEP 2: TOKENS
+FORM 2: TOKENS
 ------------------------------------------------------------
 
 TOKEN		TYPE
 
-var			keyword
+var			identifier
 x           identifier
-=           symbol
+=           operator
 1           literal
 ;           semicolon
 
-var         keyword
+var         identifier
 x2          identifier
-=           symbol
+=           operator
 1           literal
 ;           semicolon
 
-var         keyword
+var         identifier
 i           identifier
-=           symbol
+=           operator
 0           literal
 ;           semicolon
 
-while       keyword
-(           symbol
+while       identifier
+(           lparen
 i           identifier
-<           symbol
+<           operator
 20          literal
-)           symbol
+)           rparen
 
-{           symbol
+{           lbrace
 
 i           identifier
-=           symbol
+=           operator
 i           identifier
-+           symbol
++           operator
 1           literal
 ;           semicolon
 
-var         keyword
+var         identifier
 x3          identifier
-=           symbol
+=           operator
 x2          identifier
-+           symbol
++           operator
 x           identifier
 ;           semicolon
 
 x           identifier
-=           symbol
+=           operator
 x2          identifier
 ;           semicolon
 
 x2          identifier
-=           symbol
+=           operator
 x3          identifier
 ;           semicolon
 
 print       identifier
-(           symbol
+(           lparen
 x3          identifier
-)           symbol
+)           rparen
 ;           semicolon
 
-}           symbol
+}           rbrace
 
 
 
-STEP 3: AST (Abstract Syntax Tree)
+FORM 3: AST (Abstract Syntax Tree)
 ------------------------------------------------------------
 
 TYPE			VALUE
@@ -123,7 +123,7 @@ expression							var x3
 
 
 
-STEP 4: INSTRUCTIONS (Virtual-Machine Code)
+FORM 4: INSTRUCTIONS (Virtual-Machine Code)
 ------------------------------------------------------------
 
 OPCODE	PARAMETER	ORIGIN

@@ -1,6 +1,11 @@
 #pragma once
 
+#include <stdio.h>
+
 typedef unsigned short error_code;
+
+#define PRINT_ERR(msg) printf("!! [%s:%d] %s\n", __FILE__, __LINE__, msg)
+#define PRINTF_ERR(format, ...) printf("!! [%s:%d] "format"\n", __FILE__, __LINE__, __VA_ARGS__)
 
 #define SUCCESS					((error_code) 0x0000)		// success
 #define EX_UNKNOWN				((error_code) 0x0001)		// unknown exception

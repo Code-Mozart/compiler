@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="src\common.c" />
     <ClCompile Include="src\lexer.c" />
+    <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\main.c" />
   </ItemGroup>
   <ItemGroup>

@@ -62,6 +62,8 @@ error_code load_bytecode(const char* const path, instruction** _instructions, ul
 		return EX_MALLOC;
 	}
 
+	// opcode_buffer could be replaced with pointer to content and len
+
 	ulong line = 1;
 	ulong count = 0;
 	char opcode_buffer[MAX_OPCODE_LEN + 1]; byte opcode_len = 0;
