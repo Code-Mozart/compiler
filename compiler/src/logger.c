@@ -4,7 +4,7 @@
 
 #include "except.h"
 
-void log(enum severity severity, const char* msg)
+void cm_log(enum severity severity, const char* msg)
 {
 	PRINT_ERR("not implemented");
 }

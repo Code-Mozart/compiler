@@ -8,5 +8,5 @@ typedef struct
 	const char* msg;
 } log_entry;
 
-void log(enum severity severity, const char* msg);
+void cm_log(enum severity severity, const char* msg);
 log_entry pop_log_entry();

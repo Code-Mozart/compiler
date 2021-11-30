@@ -23,7 +23,7 @@ static struct {
 inline static error_code init_token_list(ulong initial_capacity)
 {
 	token_list.count = 0;
-	token_list.buffer = (token*)malloc(initial_capacity);
+	token_list.buffer = (token*)calloc(initial_capacity, sizeof(token));
 	if (!token_list.buffer)
 	{
 		token_list.capacity = 0;
@@ -39,7 +39,7 @@ inline static error_code resize_token_list(ulong min_capacity)
 	printf("resizing token list\n");
 
 	ulong new_capacity = min((token_list.capacity * 3L) / 2L, min_capacity);
-	const token* temp = (token*)malloc(new_capacity);
+	token* temp = (token*)calloc(new_capacity, sizeof(token));
 	if (!temp) return EX_MALLOC;
 
 	memcpy_s(temp, new_capacity, token_list.buffer, token_list.capacity);
@@ -78,7 +78,7 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 	if (*_tokens) return EX_OUTARG_NOT_NULL;
 	if (!size)
 	{
-		log(WARNING, "src is empty");
+		cm_log(WARNING, "src is empty");
 		*_count = 0;
 		return SUCCESS;
 	}
@@ -179,6 +179,9 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 	}
 
 	*_tokens = token_list.buffer;
+	token_list.buffer = NULL;
+	token_list.capacity = 0;
 	*_count = token_list.count;
+	token_list.count = 0;
 	return SUCCESS;
 }

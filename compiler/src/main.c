@@ -1,12 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "fileio.h"
 #include "lexer.h"
 
+static void print_tokens(token* tokens, ulong count)
+{
+	printf("TOKENS:\n");
 
-// todo: remove
-#include <string.h>
+	char buffer[0x100];
+	for (int i = 0; i < count; i++)
+	{
+		memset(buffer, '\0', ARRLEN(buffer));
+
+		token* t = &tokens[i];
+		const char* type_str = NULL;
+		switch (t->type)
+		{
+		case IDENTIFIER:	type_str = "identifier";	break;
+		case LITERAL:		type_str = "literal";		break;
+		case LPAREN:		type_str = "lparen";		break;
+		case RPAREN:		type_str = "rparen";		break;
+		case OPERATOR:		type_str = "operator";		break;
+		case LBRACE:		type_str = "lbrace";		break;
+		case RBRACE:		type_str = "rbrace";		break;
+		case SEMICOLON:		type_str = "semicolon";		break;
+		}
+		strncpy_s(buffer, ARRLEN(buffer), t->string, t->len);
+		printf("%s\t%s\n", type_str, buffer);
+	}
+}
 
 int main(int argc, char** argv)
 {
@@ -32,35 +56,14 @@ int main(int argc, char** argv)
 	if (e)
 	{
 		PRINT_ERR("error while performing lexical analysis");
-		free(src_code);
 		if (tokens) free(tokens);
+		free(src_code);
 		return 1;
 	}
+	print_tokens(tokens, token_count);
 
-	//printf("TOKENS:\n");
-	//char* chars = NULL;
-	//for (int i = 0; i < token_count; i++)
-	//{
-	//	token* t = &tokens[i];
-	//	const char* type_str = NULL;
-	//	switch (t->type)
-	//	{
-	//	case IDENTIFIER:	type_str = MAKE_STRING(IDENTIFIER);	break;
-	//	case LITERAL:		type_str = MAKE_STRING(LITERAL);	break;
-	//	case LPAREN:		type_str = MAKE_STRING(LPAREN);		break;
-	//	case RPAREN:		type_str = MAKE_STRING(RPAREN);		break;
-	//	case OPERATOR:		type_str = MAKE_STRING(OPERATOR);	break;
-	//	case LBRACE:		type_str = MAKE_STRING(LBRACE);		break;
-	//	case RBRACE:		type_str = MAKE_STRING(RBRACE);		break;
-	//	case SEMICOLON:		type_str = MAKE_STRING(SEMICOLON);	break;
-	//	}
-	//	chars = (char*)malloc(t->len + 1);
-	//	memset(chars, '\0', t->len + 1);
-	//	printf("%s\t%s\n", type_str, chars);
-	//	free(chars);
-	//}
-
-	// now the src_code is no longer needed
+	// now the src_code is no longer needed (make 100% sure all tokens are freed)
+	free(tokens);
 	free(src_code);
 
 	return 0;
