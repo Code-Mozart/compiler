@@ -36,7 +36,7 @@ error_code load_file(const char* const path, char** _content, ulong* _size)
 		*_size = file_size;
 	}
 
-	ulong buffer_size = sizeof(char) * (file_size + 1L);
+	size_t buffer_size = sizeof(char) * ((size_t)file_size + 1);
 	char* buffer = (char*)malloc(buffer_size);
 	if (!buffer)
 	{
@@ -45,7 +45,7 @@ error_code load_file(const char* const path, char** _content, ulong* _size)
 	}
 
 	rewind(file);
-	uint read_size = fread_s(buffer, buffer_size, sizeof(char), file_size, file);
+	size_t read_size = fread_s(buffer, buffer_size, sizeof(char), file_size, file);
 	if (read_size != file_size)
 	{
 		free(buffer);

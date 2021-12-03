@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "util.h"
 
 #define MAX_OPCODE_LEN 4
@@ -14,7 +16,7 @@ enum opcode {
 };
 
 const char* opcode_strings[];
-uint get_opcodes_count();
+size_t get_opcodes_count();
 #define OPCODE_STRINGS const char* opcode_strings[] = {				\
 							"nop", "stop",							\
 							"push", "load", "str",					\

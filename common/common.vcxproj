@@ -142,6 +142,7 @@
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\except.h" />
     <ClInclude Include="src\fileio.h" />
+    <ClInclude Include="src\list.h" />
     <ClInclude Include="src\util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

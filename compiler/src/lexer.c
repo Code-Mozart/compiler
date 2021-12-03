@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#include "list.h"
+
 #include "logger.h"
 
 static char delimiters[] = {
@@ -15,53 +17,21 @@ static char delimiters[] = {
 
 // TOKEN LIST
 
-static struct {
-	token* buffer;
-	ulong capacity;
-	ulong count;
-} token_list;
+static list token_list;
 
 inline static error_code init_token_list(ulong initial_capacity)
 {
-	token_list.count = 0;
-	token_list.buffer = (token*)calloc(initial_capacity, sizeof(token));
-	if (!token_list.buffer)
-	{
-		token_list.capacity = 0;
-		return EX_MALLOC;
-	}
-	token_list.capacity = initial_capacity;
-	return SUCCESS;
-}
-
-inline static error_code resize_token_list(ulong min_capacity)
-{
-	// todo: remove
-	printf("resizing token list\n");
-
-	ulong new_capacity = min((token_list.capacity * 3L) / 2L, min_capacity);
-	token* temp = (token*)calloc(new_capacity, sizeof(token));
-	if (!temp) return EX_MALLOC;
-
-	memcpy_s(temp, new_capacity, token_list.buffer, token_list.capacity);
-	free(token_list.buffer);
-	
-	token_list.buffer = temp;
-	token_list.capacity = new_capacity;
-	return SUCCESS;
+	return list_init(initial_capacity, sizeof(token), &token_list);
 }
 
 static error_code add_token(
 	ulong line, ulong pos, enum token_type type, const char* const string, byte len, word value
 )
 {
-	if (token_list.count >= token_list.capacity)
-	{
-		error_code e = resize_token_list(token_list.capacity + 1);
-		if (e) return e;
-	}
+	token* t = NULL;
+	error_code e = list_append(&token_list, sizeof(token), &t);
+	if (e) return e;
 
-	token* t = &token_list.buffer[token_list.count++];
 	t->line = line;
 	t->pos = pos;
 	t->type = type;
@@ -214,10 +184,6 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 		}
 	}
 
-	*_tokens = token_list.buffer;
-	token_list.buffer = NULL;
-	token_list.capacity = 0;
-	*_count = token_list.count;
-	token_list.count = 0;
+	list_release(&token_list, _tokens, NULL, _count);
 	return SUCCESS;
 }

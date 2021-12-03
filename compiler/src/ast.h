@@ -1,4 +1,5 @@
 #include "util.h"
+#include "except.h"
 
 enum ast_type {
 	AST_NONE = 0,
@@ -30,15 +31,19 @@ typedef struct ast_bin_op ast_bin_op;			// Binary Operator Node
 
 
 
+error_code free_ast();
+
 struct ast_node {
-	long line, pos;
+	ulong line, pos;
 	enum ast_type type;
 };
 
 struct ast_sequence {
 	ast_node node;
-	ast_stm* statements; ushort count;
+	ast_stm** statements; ushort count;
 };
+error_code ast_create_sequence(ast_sequence** _node, ulong line, ulong pos);
+error_code ast_seq_append(ast_sequence* node, ast_stm* stm);
 
 
 
@@ -51,24 +56,30 @@ struct ast_decl {
 	const char* identifier; byte len;
 	ast_expr* val;
 };
+error_code ast_create_decl(ast_decl** _node, ulong line, ulong pos, const char* identifier, byte len);
 
 struct ast_assign {
 	ast_stm stm;
 	const char* var; byte len;
 	ast_expr* val;
 };
+error_code ast_create_assign(ast_assign** _node, ulong line, ulong pos, const char* var, byte len);
 
 struct ast_while {
 	ast_stm stm;
 	ast_bin_op* condition;
-	ast_stm* body; ushort count;
+	ast_stm** body; ushort count;
 };
+error_code ast_create_while(ast_while** _node, ulong line, ulong pos);
+error_code ast_while_append(ast_while* node, ast_stm* stm);
 
 struct ast_call {
 	ast_stm stm;
 	const char* identifier; byte len;
-	ast_expr* args; ushort count;
+	ast_expr** args; ushort count;
 };
+error_code ast_create_call(ast_call** _node, ulong line, ulong pos, const char* identifier, byte len);
+error_code ast_call_append(ast_call* node, ast_expr* arg);
 
 
 
@@ -80,11 +91,13 @@ struct ast_const {
 	ast_expr expr;
 	word val;
 };
+error_code ast_create_const(ast_const** _node, ulong line, ulong pos, word val);
 
 struct ast_var {
 	ast_expr expr;
 	const char* identifier; byte len;
 };
+error_code ast_create_var(ast_var** _node, ulong line, ulong pos, const char* identifier, byte len);
 
 struct ast_bin_op {
 	ast_expr expr;
@@ -92,3 +105,4 @@ struct ast_bin_op {
 	ast_expr* lhs;
 	ast_expr* rhs;
 };
+error_code ast_create_bin_op(ast_bin_op** _node, ulong line, ulong pos, enum ast_op op);
