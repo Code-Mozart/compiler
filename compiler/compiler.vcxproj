@@ -159,10 +159,13 @@
     <ClCompile Include="src\lexer.c" />
     <ClCompile Include="src\logger.c" />
     <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\parser.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ast.h" />
     <ClInclude Include="src\lexer.h" />
     <ClInclude Include="src\logger.h" />
+    <ClInclude Include="src\parser.h" />
     <ClInclude Include="src\token.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -27,6 +27,9 @@
     <ClCompile Include="src\logger.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\token.h">
@@ -36,6 +39,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

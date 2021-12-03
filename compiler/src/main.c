@@ -4,6 +4,7 @@
 
 #include "fileio.h"
 #include "lexer.h"
+#include "parser.h"
 
 static void print_tokens(token* tokens, ulong count)
 {
@@ -26,10 +27,33 @@ static void print_tokens(token* tokens, ulong count)
 		case LBRACE:		type_str = "lbrace";		break;
 		case RBRACE:		type_str = "rbrace";		break;
 		case SEMICOLON:		type_str = "semicolon";		break;
+		default:			type_str = "-";				break;
 		}
-		strncpy_s(buffer, ARRLEN(buffer), t->string, t->len);
-		printf("%s\t%s\n", type_str, buffer);
+		if (t->string)
+		{
+			if (t->len == 1)
+			{
+				switch (t->string[0])
+				{
+				case '\n':	buffer[0] = '\\'; buffer[1] = 'n';	break;
+				case '\t':	buffer[0] = '\\'; buffer[1] = 't';	break;
+				case '\r':	buffer[0] = '\\'; buffer[1] = 'r';	break;
+				default:	buffer[0] = t->string[0];			break;
+				}
+			}
+			else
+			{
+				strncpy_s(buffer, ARRLEN(buffer), t->string, t->len);
+			}
+			printf("%s\t%s\n", type_str, buffer);
+		}
+		else
+		{
+			printf("%s\t%d\n", type_str, t->value);
+		}
 	}
+
+	printf("\n");
 }
 
 int main(int argc, char** argv)
@@ -61,6 +85,17 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	print_tokens(tokens, token_count);
+
+	ast_node* ast_root = NULL;
+	e = build_ast(tokens, token_count, &ast_root);
+	if (e)
+	{
+		PRINT_ERR("error while performing lexical analysis");
+		// free ast_root
+		free(tokens);
+		free(src_code);
+		return 1;
+	}
 
 	// now the src_code is no longer needed (make 100% sure all tokens are freed)
 	free(tokens);

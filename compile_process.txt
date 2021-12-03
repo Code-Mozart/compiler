@@ -86,40 +86,55 @@ x3          identifier
 FORM 3: AST (Abstract Syntax Tree)
 ------------------------------------------------------------
 
-TYPE			VALUE
+LABEL			VALUE
 
 root			sequence
-statement			assignment
-destination				var x
-expression				1
-statement			assignment
-destination				var x2
-expression				1
-statement			while
-condition				compare-less-than
-lhs							var i
-rhs							20
-body					sequence
-statement					assignment
-destination						var i
-expression						addition
-lhs									var i
-rhs									1
-statement					assignment
-destination						var x3
-expression						addition
-lhs									var x2
-rhs									var x
-statement					assignment
-destination						var x
-expression						var x2
-statement					assignment
-destination						var x2
-expression						var x3
-statement					"function call"
-function						print
-arguments						arguments
-expression							var x3
+statement[1]		declaration
+identifier				x
+value					constant
+value						1
+statement[2]		declaration
+identifier				x2
+value					constant
+value						1
+statement[3]		declaration
+value					i
+value					constant
+literal						0
+statement[4]		while
+condition				binary_operator
+operator					<
+lhs							variable
+identifier						i
+rhs							constant
+value							20
+body[1]					assignment
+variable					i
+value						binary_operator
+operator						+
+lhs								variable
+identifier							i
+rhs								constant
+value								1
+body[2]					declaration
+identifier					x3
+expression					binary_operator
+lhs								variable
+identifier							x2
+rhs								variable
+identifier							x
+body[3]					assignment
+variable					x
+expression					variable
+identifier						x2
+body[3]					assignment
+variable					x2
+expression					variable
+identifier						x3
+body[5]					function call
+function					print
+arguments[0]				variable
+identifier						x3
 
 
 

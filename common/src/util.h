@@ -3,7 +3,6 @@
 #include <stdbool.h>
 
 #define ARRLEN(arr) (sizeof(arr) / sizeof(arr[0]))
-#define MAX_VAL_INT(var) (sizeof(var) * 0xFF)
 
 #define GET_BIT(bits, mask) (bits & mask)
 #define SET_BIT(bits, mask) bits |= mask

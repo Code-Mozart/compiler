@@ -1,0 +1,27 @@
+Node
+  "line": integer
+  "pos": integer
+> Sequence
+    "statements": Statement[]
+> Statement
+  > Declaration
+      "identifier": identifier
+	  "value": Expression?
+  > Assignment
+      "variable": identifier
+	  "value": Expression
+  > While_Loop
+      "condition": Binary_Operator
+	  "body": Statement[]
+  > Function_Call
+      "function": identifier
+	  "arguments": Expression[]
+> Expression
+  > Constant
+      "value": literal
+  > Binary_Operator
+      "operator": operator
+	  "lhs": Expression
+	  "rhs": Expression
+  > Variable
+      "identifier": identifier
