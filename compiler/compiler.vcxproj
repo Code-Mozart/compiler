@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ast.c" />
     <ClCompile Include="src\common.c" />
     <ClCompile Include="src\lexer.c" />
     <ClCompile Include="src\logger.c" />

@@ -30,6 +30,9 @@
     <ClCompile Include="src\parser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ast.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\token.h">

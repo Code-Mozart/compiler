@@ -1,6 +1,8 @@
 #include "util.h"
 #include "except.h"
 
+#include "list.h"
+
 enum ast_type {
 	AST_NONE = 0,
 	AST_SEQUENCE,
@@ -31,6 +33,7 @@ typedef struct ast_bin_op ast_bin_op;			// Binary Operator Node
 
 
 
+error_code init_ast();
 error_code free_ast();
 
 struct ast_node {
@@ -40,7 +43,7 @@ struct ast_node {
 
 struct ast_sequence {
 	ast_node node;
-	ast_stm** statements; ushort count;
+	list statements; // list<ast_stm*>
 };
 error_code ast_create_sequence(ast_sequence** _node, ulong line, ulong pos);
 error_code ast_seq_append(ast_sequence* node, ast_stm* stm);
@@ -68,7 +71,7 @@ error_code ast_create_assign(ast_assign** _node, ulong line, ulong pos, const ch
 struct ast_while {
 	ast_stm stm;
 	ast_bin_op* condition;
-	ast_stm** body; ushort count;
+	list body; // list<ast_stm*>
 };
 error_code ast_create_while(ast_while** _node, ulong line, ulong pos);
 error_code ast_while_append(ast_while* node, ast_stm* stm);
@@ -76,7 +79,7 @@ error_code ast_while_append(ast_while* node, ast_stm* stm);
 struct ast_call {
 	ast_stm stm;
 	const char* identifier; byte len;
-	ast_expr** args; ushort count;
+	list args; // list<ast_expr*>
 };
 error_code ast_create_call(ast_call** _node, ulong line, ulong pos, const char* identifier, byte len);
 error_code ast_call_append(ast_call* node, ast_expr* arg);

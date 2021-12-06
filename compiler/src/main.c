@@ -91,13 +91,14 @@ int main(int argc, char** argv)
 	if (e)
 	{
 		PRINT_ERR("error while performing lexical analysis");
-		// free ast_root
+		free_ast();
 		free(tokens);
 		free(src_code);
 		return 1;
 	}
 
 	// now the src_code is no longer needed (make 100% sure all tokens are freed)
+	free_ast();
 	free(tokens);
 	free(src_code);
 

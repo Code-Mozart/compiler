@@ -15,12 +15,13 @@ error_code list_init(size_t initial_capacity, size_t element_size, list* _list);
 // returns the pointer to the appended element,
 // the caller should cast it and set its values
 // 'element_size' in bytes
-error_code list_append(list* list, size_t element_size, void* _ptr);
+// in case of failure '_ptr' is guaranteed to be null
+error_code list_append(list* list, size_t element_size, void** _ptr);
 // releases the list, deletes its knowledge of the memory block
 // and writes them into the output parameters
 // ! CAREFULL, if the ptr is not previously captured the allocated
 // memory can never be freed
-error_code list_release(list* list, void* _ptr, size_t* _capacity, size_t* _count);
+error_code list_release(list* list, void** _ptr, size_t* _capacity, size_t* _count);
 error_code list_free(list* list);
 
 
