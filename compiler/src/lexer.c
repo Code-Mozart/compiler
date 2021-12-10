@@ -61,7 +61,7 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 	error_code e = init_token_list(size / 2);
 	if (e) return e;
 
-	// todo: add line & pos
+	ulong line = 1, pos = 0;
 
 	enum { comment = 0x01, skip_line = 0x02, delim_match = 0x04, int_literal = 0x08, negative = 0x10 };
 	byte flags = 0x0;
@@ -70,13 +70,18 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 	for (int i = 0; i < size; i++)
 	{
 		char c = src[i];
+		pos++;
 		if (c == '\r')
 			continue;
 
 		if (GET_BIT(flags, skip_line))
 		{
 			if (c == '\n')
+			{
 				CLEAR_BIT(flags, skip_line);
+				line++;
+				pos = 0;
+			}
 			continue;
 		}
 		else if (GET_BIT(flags, comment))
@@ -115,21 +120,22 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 		{
 			if (identifier_begin)
 			{
-				e = add_token(0, 0, IDENTIFIER, identifier_begin, identifier_len, SHRT_MIN);
+				e = add_token(line, pos - identifier_len,
+					IDENTIFIER, identifier_begin, identifier_len, SHRT_MIN);
 				if (e) return e;
 				identifier_begin = NULL;
 				identifier_len = 0;
 			}
 			else if (GET_BIT(flags, int_literal))
 			{
-				e = add_token(0, 0, LITERAL, NULL, 0, GET_BIT(flags, negative) ? -value : value);
+				e = add_token(line, pos - identifier_len - GET_BIT(flags, negative),
+					LITERAL, NULL, 0, GET_BIT(flags, negative) ? -value : value);
 				value = 0;
+				identifier_len = 0;
 				CLEAR_BIT(flags, negative);
 				CLEAR_BIT(flags, int_literal);
 			}
-			// todo: literals
 
-			// todo: check special delims like '\n'
 			enum token_type type;
 			switch (c)
 			{
@@ -146,9 +152,11 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 			case '<':
 			case '>':	type = OPERATOR;	break;
 
+			case '\n': line++; pos = 0;
+
 			default: continue;
 			}
-			e = add_token(0, 0, type, src + i, 1, SHRT_MIN);
+			e = add_token(line, pos, type, src + i, 1, SHRT_MIN);
 			if (e) return e;
 		}
 		else
@@ -157,6 +165,7 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 			{
 				// todo: prevent overflow
 				value = value * 10 + (c - '0');
+				identifier_len++;
 			}
 			else if (identifier_begin)
 			{
@@ -169,6 +178,7 @@ error_code lex_analyze(const char* src, ulong size, token** _tokens, ulong* _cou
 				if (is_int(c))
 				{
 					value = (c - '0');
+					identifier_len++;
 					SET_BIT(flags, int_literal);
 				}
 				else if (is_valid_char_1(c))

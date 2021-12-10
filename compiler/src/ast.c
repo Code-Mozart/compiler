@@ -181,3 +181,117 @@ error_code ast_create_bin_op(ast_bin_op** _node, ulong line, ulong pos, enum ast
 	(*_node)->op = op;
 	return SUCCESS;
 }
+
+
+
+// DEBUG
+
+#include <stdio.h>
+#include <string.h>
+
+const char* ast_type_to_string(enum ast_type type)
+{
+	switch (type)
+	{
+	case AST_NONE:		return "None";
+
+	case AST_SEQUENCE:	return "Sequence";
+
+	case AST_DECL:		return "Declaration";
+	case AST_ASSIGN:	return "Assignment";
+	case AST_WHILE:		return "While";
+	case AST_CALL:		return "Call";
+
+	case AST_CONST:		return "Constant";
+	case AST_BIN_OP:	return "Binary Operator";
+	case AST_VAR:		return "Variable";
+
+	default:			return "[ERROR: Unknown Type]";
+	}
+}
+
+inline static void print_indents(uint count) { for (uint i = 0; i < count; i++) printf("  "); }
+
+static void print_node(ast_node* node, uint depth)
+{
+	print_indents(depth);
+	if (!node)
+	{
+		printf("%s\n", (const char*)NULL);
+		return;
+	}
+	printf("%s [%d:%d]\n", ast_type_to_string(node->type), node->line, node->pos);
+
+	switch (node->type)
+	{
+	case AST_SEQUENCE:
+	{
+		ast_sequence* concrete = node;
+		for (int i = 0; i < concrete->statements.count; i++)
+			print_node(&(LIST_GET(concrete->statements, ast_stm*, i)->node), depth + 1);
+		break;
+	}
+
+	case AST_DECL:
+	{
+		ast_decl* concrete = node;
+		print_indents(depth + 1);
+		printf("Identifier '");
+		PRINT_STR(concrete->identifier, concrete->len, 0x100);
+		printf("'\n");
+		print_node(concrete->val, depth + 1);
+		break;
+	}
+	case AST_ASSIGN:
+	{
+		ast_assign* concrete = node;
+		print_indents(depth + 1);
+		printf("Variable '");
+		PRINT_STR(concrete->var, concrete->len, 0x100);
+		printf("'\n");
+		print_node(concrete->val, depth + 1);
+		break;
+	}
+	case AST_WHILE:
+	{
+		ast_while* concrete = node;
+		print_node(concrete->condition, depth + 1);
+		for (int i = 0; i < concrete->body.count; i++)
+			print_node(&(LIST_GET(concrete->body, ast_stm*, i)->node), depth + 1);
+		break;
+	}
+
+	case AST_CONST:
+	{
+		ast_const* concrete = node;
+		print_indents(depth + 1);
+		printf("Value %d\n", concrete->val);
+		break;
+	}
+	case AST_VAR:
+	{
+		ast_var* concrete = node;
+		print_indents(depth + 1);
+		printf("Identifier '");
+		PRINT_STR(concrete->identifier, concrete->len, 0x100);
+		printf("'\n");
+		break;
+	}
+	case AST_BIN_OP:
+	{
+		ast_bin_op* concrete = node;
+		print_indents(depth + 1);
+		printf("Operator %c\n", concrete->op);
+		print_node(&(concrete->lhs->node), depth + 1);
+		print_node(&(concrete->rhs->node), depth + 1);
+		break;
+	}
+	}
+}
+
+error_code ast_print(ast_node* root)
+{
+	if (!root) return EX_NULL;
+	print_node(root, 0);
+	return SUCCESS;
+}

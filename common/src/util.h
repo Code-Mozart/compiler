@@ -10,6 +10,13 @@
 #define FLIP_BIT(bits, mask) bits ^= mask
 
 #define MAKE_STRING(x) #x
+#define TO_STR_BUFFER(ptr, len, max)	char buffer[max];					\
+										memset(buffer, '\0', max);			\
+										strncpy_s(buffer, max, ptr, len)
+#define PRINT_STR(ptr, len, max)	{									\
+										TO_STR_BUFFER(ptr, len, max);	\
+										printf("%s", buffer);			\
+									}
 
 typedef unsigned char byte;
 typedef short int word;

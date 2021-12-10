@@ -24,6 +24,8 @@ error_code list_append(list* list, size_t element_size, void** _ptr);
 error_code list_release(list* list, void** _ptr, size_t* _capacity, size_t* _count);
 error_code list_free(list* list);
 
+#define LIST_GET(list, type, index) (((type*)list.ptr)[index])
+
 
 #ifdef IMPL_COMMON
 
@@ -49,11 +51,11 @@ error_code list_init(size_t initial_capacity, size_t size, list* _list)
 // trust parameters are valid
 inline static error_code list_resize(list* list, size_t size, size_t min_capacity)
 {
-	size_t new_capacity = min(LIST_RESIZE_FN(list->capacity), min_capacity);
+	size_t new_capacity = max(LIST_RESIZE_FN(list->capacity), min_capacity);
 	void* temp = calloc(new_capacity, size);
 	if (!temp) return EX_MALLOC;
 
-	memcpy_s(temp, new_capacity, list->ptr, list->capacity);
+	memcpy_s(temp, new_capacity * size, list->ptr, list->count * size);
 	free(list->ptr);
 
 	list->ptr = temp;

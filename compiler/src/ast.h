@@ -9,6 +9,7 @@ enum ast_type {
 	AST_DECL, AST_ASSIGN, AST_WHILE, AST_CALL,
 	AST_CONST, AST_BIN_OP, AST_VAR
 };
+const char* ast_type_to_string(enum ast_type type);
 
 enum ast_op {
 	AST_LT = '<',
@@ -109,3 +110,9 @@ struct ast_bin_op {
 	ast_expr* rhs;
 };
 error_code ast_create_bin_op(ast_bin_op** _node, ulong line, ulong pos, enum ast_op op);
+
+
+
+// DEBUG
+
+error_code ast_print(ast_node* root);

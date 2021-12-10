@@ -6,6 +6,28 @@
 #include "lexer.h"
 #include "parser.h"
 
+// DEBUG
+
+#define TOKEN_COL_WIDTH 16
+#define PARAM_COL_WIDTH 10
+
+static void print_table_entry(const char* const string, uint column_width)
+{
+	uint space = column_width - strnlen_s(string, column_width);
+	if (space <= 0)
+	{
+		for (int i = 0; i < (column_width - 4); i++)
+			printf("%c", string[i]);
+		printf("... ");
+	}
+	else
+	{
+		printf(string);
+		for (int i = 0; i < space; i++)
+			printf(" ");
+	}
+}
+
 static void print_tokens(token* tokens, ulong count)
 {
 	printf("TOKENS:\n");
@@ -45,16 +67,27 @@ static void print_tokens(token* tokens, ulong count)
 			{
 				strncpy_s(buffer, ARRLEN(buffer), t->string, t->len);
 			}
-			printf("%s\t%s\n", type_str, buffer);
 		}
 		else
 		{
-			printf("%s\t%d\n", type_str, t->value);
+			sprintf_s(buffer, ARRLEN(buffer), "%d", t->value);
 		}
+		print_table_entry(type_str, TOKEN_COL_WIDTH);
+		print_table_entry(buffer, PARAM_COL_WIDTH);
+		printf("%d:%d\n", t->line, t->pos);
 	}
 
 	printf("\n");
 }
+
+static void print_ast(ast_node* root)
+{
+	printf("ABSTRACT SYNTAX TREE\n");
+	ast_print(root);
+	printf("\n");
+}
+
+// MAIN
 
 int main(int argc, char** argv)
 {
@@ -96,6 +129,7 @@ int main(int argc, char** argv)
 		free(src_code);
 		return 1;
 	}
+	print_ast(ast_root);
 
 	// now the src_code is no longer needed (make 100% sure all tokens are freed)
 	free_ast();
