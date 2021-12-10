@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 	e = build_ast(tokens, token_count, &ast_root);
 	if (e)
 	{
-		PRINT_ERR("error while performing lexical analysis");
+		PRINT_ERR("error while building an abstract syntax tree");
 		free_ast();
 		free(tokens);
 		free(src_code);

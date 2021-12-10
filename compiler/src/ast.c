@@ -26,16 +26,16 @@ error_code init_ast()
 {
 	// todo: handle errors
 
-	list_init(INITIAL_CAPACITY, sizeof(ast_sequence), &seqs_list);
+	list_init(INITIAL_CAPACITY,	sizeof(ast_sequence),	&seqs_list);
 
-	list_init(INITIAL_CAPACITY, sizeof(ast_decl), &decls_list);
-	list_init(INITIAL_CAPACITY, sizeof(ast_assign), &assigns_list);
-	list_init(INITIAL_CAPACITY, sizeof(ast_while), &whiles_list);
-	list_init(INITIAL_CAPACITY, sizeof(ast_call), &calls_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_decl),		&decls_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_assign),		&assigns_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_while),		&whiles_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_call),		&calls_list);
 
-	list_init(INITIAL_CAPACITY, sizeof(ast_const), &consts_list);
-	list_init(INITIAL_CAPACITY, sizeof(ast_var), &vars_list);
-	list_init(INITIAL_CAPACITY, sizeof(ast_bin_op), &bin_ops_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_const),		&consts_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_var),		&vars_list);
+	list_init(INITIAL_CAPACITY, sizeof(ast_bin_op),		&bin_ops_list);
 
 	return SUCCESS;
 }
@@ -60,29 +60,53 @@ error_code free_ast()
 
 
 
+// COMMON
+
+inline static error_code create_node(
+	list* list, size_t node_size, enum ast_type type, ulong line, ulong pos, void** _ptr
+)
+{
+	if (!_ptr) return EX_NULL;
+	if (*_ptr) return EX_OUTARG_NOT_NULL;
+
+	error_code e = list_append(list, node_size, _ptr);
+	if (e) return e;
+	((ast_node*)*_ptr)->type = type;
+	((ast_node*)*_ptr)->line = line;
+	((ast_node*)*_ptr)->pos = pos;
+	return SUCCESS;
+}
+
+#define CREATE_NODE(list, type, enum_val) \
+	create_node(&list, sizeof(type), enum_val, line, pos, _node);
+
+#define CREATE_NODE_WITH_STRING(list, type, enum_val, str_attr)		\
+	error_code e = CREATE_NODE(list, type, enum_val, line, pos);	\
+	if (e) return e;												\
+	(*_node)->str_attr = str_attr; (*_node)->len = len
+
+inline static error_code append_node(list* list, void* node)
+{
+	void** node_ptr = NULL;
+	error_code e = list_append(list, sizeof(void*), &node_ptr);
+	if (e) return e;
+
+	*node_ptr = node;
+	return SUCCESS;
+}
+
+
+
 // SEQUENCE
 
 error_code ast_create_sequence(ast_sequence** _node, ulong line, ulong pos)
 {
-	if (!_node) return EX_NULL;
-	if (*_node) return EX_OUTARG_NOT_NULL;
-
-	error_code e = list_append(&seqs_list, sizeof(ast_sequence), _node);
-	if (e) return e;
-	(*_node)->node.type = AST_SEQUENCE;
-	(*_node)->node.line = line;
-	(*_node)->node.pos = pos;
-	return SUCCESS;
+	return CREATE_NODE(seqs_list, ast_sequence, AST_SEQUENCE);
 }
 
 error_code ast_seq_append(ast_sequence* node, ast_stm* stm)
 {
-	ast_stm** stm_ptr = NULL;
-	error_code e = list_append(&(node->statements), sizeof(ast_stm*), &stm_ptr);
-	if (e) return e;
-
-	*stm_ptr = stm;
-	return SUCCESS;
+	return append_node(&(node->statements), stm);
 }
 
 
@@ -91,14 +115,69 @@ error_code ast_seq_append(ast_sequence* node, ast_stm* stm)
 
 error_code ast_create_decl(ast_decl** _node, ulong line, ulong pos, const char* identifier, byte len)
 {
-	if (!_node) return EX_NULL;
-	if (*_node) return EX_OUTARG_NOT_NULL;
+	CREATE_NODE_WITH_STRING(decls_list, ast_decl, AST_DECL, identifier);
+	return SUCCESS;
+}
 
-	error_code e = list_append(&decls_list, sizeof(ast_decl), _node);
+// ASSIGNMENT
+
+error_code ast_create_assign(ast_assign** _node, ulong line, ulong pos, const char* var, byte len)
+{
+	CREATE_NODE_WITH_STRING(decls_list, ast_decl, AST_DECL, var);
+	return SUCCESS;
+}
+
+// WHILE
+
+error_code ast_create_while(ast_while** _node, ulong line, ulong pos)
+{
+	return CREATE_NODE(whiles_list, ast_while, AST_WHILE);
+}
+
+error_code ast_while_append(ast_while* node, ast_stm* stm)
+{
+	return append_node(&(node->body), stm);
+}
+
+// CALL
+
+error_code ast_create_call(ast_call** _node, ulong line, ulong pos, const char* identifier, byte len)
+{
+	CREATE_NODE_WITH_STRING(calls_list, ast_call, AST_CALL, identifier);
+	return SUCCESS;
+}
+
+error_code ast_call_append(ast_call* node, ast_expr* arg)
+{
+	return append_node(&(node->args), arg);
+}
+
+
+
+// CONSTANT
+
+error_code ast_create_const(ast_const** _node, ulong line, ulong pos, word val)
+{
+	error_code e = CREATE_NODE(consts_list, ast_const, AST_CONST);
 	if (e) return e;
-	(*_node)->stm.node.type = AST_DECL;
-	(*_node)->stm.node.line = line;
-	(*_node)->stm.node.pos = pos;
-	(*_node)->identifier = identifier; (*_node)->len = len;
+	(*_node)->val = val;
+	return SUCCESS;
+}
+
+// VARIABLE
+
+error_code ast_create_var(ast_var** _node, ulong line, ulong pos, const char* identifier, byte len)
+{
+	CREATE_NODE_WITH_STRING(vars_list, ast_var, AST_VAR, identifier);
+	return SUCCESS;
+}
+
+// BINARY OPERATOR
+
+error_code ast_create_bin_op(ast_bin_op** _node, ulong line, ulong pos, enum ast_op op)
+{
+	error_code e = CREATE_NODE(bin_ops_list, ast_bin_op, AST_BIN_OP);
+	if (e) return e;
+	(*_node)->op = op;
 	return SUCCESS;
 }
