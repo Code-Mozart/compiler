@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstddef>
+#include <stddef.h>
 
 #include "util.h"
 
@@ -8,8 +8,9 @@
 
 enum opcode {
 	NOP, STOP,	
-	PUSH, LOAD, STR,
+	PUSH, POP, LOAD, STR,
 	JMP, JZ,
+	CALL, RET,
 	ADD, SUB, MUL, DIV, MOD,
 	LT,
 	COUT
@@ -19,8 +20,9 @@ const char* opcode_strings[];
 size_t get_opcodes_count();
 #define OPCODE_STRINGS const char* opcode_strings[] = {				\
 							"nop", "stop",							\
-							"push", "load", "str",					\
+							"push", "pop", "load", "str",			\
 							"jmp", "jz",							\
+							"call", "ret",							\
 							"add", "sub", "mul", "div", "mod",		\
 							"lt",									\
 							"cout"									\

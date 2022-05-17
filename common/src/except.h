@@ -7,6 +7,9 @@ typedef unsigned short error_code;
 #define PRINT_ERR(msg) printf("!! [%s:%d] %s\n", __FILE__, __LINE__, msg)
 #define PRINTF_ERR(format, ...) printf("!! [%s:%d] "format"\n", __FILE__, __LINE__, __VA_ARGS__)
 
+#define TRY(x) { error_code e = x; if (e) return e; }
+
+
 #define SUCCESS					((error_code) 0x0000)		// success
 #define EX_UNKNOWN				((error_code) 0x0001)		// unknown exception
 #define EX_MALLOC				((error_code) 0x0001)		// failed to allocate memory

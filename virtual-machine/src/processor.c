@@ -35,6 +35,9 @@ void run(instruction* instructions, ulong count)
 		case PUSH:
 			stack_push(pc->param);
 			break;
+		case POP:
+			stack_pop(NULL);
+			break;
 		case LOAD:
 		{
 			word w = 0;
@@ -68,6 +71,24 @@ void run(instruction* instructions, ulong count)
 				pc += pc->param;
 				inc_pc = false;
 			}
+			break;
+		}
+
+		case CALL:
+		{
+			word call_line = pc - instructions;
+			stack_push(call_line);
+			line = call_line + 1;
+			pc = instructions + pc->param;
+			inc_pc = false;
+			break;
+		}
+		case RET:
+		{
+			word w = 0;
+			stack_pop(&w);
+			line = w + 1;
+			pc = instructions + w;
 			break;
 		}
 

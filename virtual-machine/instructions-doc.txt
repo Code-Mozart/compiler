@@ -9,12 +9,18 @@ JMP <by>			unconditional jump by the specified offset
 JZ <by>				pops the last element, if zero jumps by the specified offset
 JNZ <by>			+ pops the last element, if not zero jumps by the specified offset
 
+CALL <line>			pushes the program counter, jumps to the specified line
+RET					pops the last element, jumps to the line specified through it
+
 ADD					pops the last two elements, pushes the sum
 SUB					pops the last two elements, pushes the difference
 MUL					pops the last two elements, pushes the product
 DIV					pops the last two elements, pushes the quotient
 MOD					pops the last two elements, pushes the remainder
 
-LT					pops the last two elements, pushes if the second is less than the first as boolean
+LT					pops the last two elements, pushes whether the second is less than the first as boolean
 
 COUT				pops the last element and prints it to the console
+
+
+@ The left-most element is always at the bottom of the stack, the right-most always at the top

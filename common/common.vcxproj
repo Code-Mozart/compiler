@@ -143,6 +143,7 @@
     <ClInclude Include="src\except.h" />
     <ClInclude Include="src\fileio.h" />
     <ClInclude Include="src\list.h" />
+    <ClInclude Include="src\string_util.h" />
     <ClInclude Include="src\util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

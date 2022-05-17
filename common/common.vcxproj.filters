@@ -30,5 +30,8 @@
     <ClInclude Include="src\list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\string_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -12,20 +12,42 @@ typedef struct list {
 
 // 'element_size' in bytes
 error_code list_init(size_t initial_capacity, size_t element_size, list* _list);
+
 // returns the pointer to the appended element,
 // the caller should cast it and set its values
 // 'element_size' in bytes
 // in case of failure '_ptr' is guaranteed to be null
 error_code list_append(list* list, size_t element_size, void** _ptr);
+
+// drops the last element of the list
+// 'element_size' in bytes
+error_code list_drop(list* list, size_t element_size);
+
+// clears the entire list
+// 'element_size' in bytes
+error_code list_clear(list* list, size_t element_size);
+
 // releases the list, deletes its knowledge of the memory block
 // and writes them into the output parameters
 // ! CAREFULL, if the ptr is not previously captured the allocated
 // memory can never be freed
 error_code list_release(list* list, void** _ptr, size_t* _capacity, size_t* _count);
+
 error_code list_free(list* list);
+
+#define LIST_MAKE(name, type, init_capacity)				\
+	list name;												\
+	TRY(list_init(init_capacity, sizeof(type), &name));		
 
 #define LIST_GET(list, type, index) (((type*)list.ptr)[index])
 
+#define LIST_GET_LAST(list, type) LIST_GET(list, type, list.count - 1)
+
+#define LIST_APPEND2(list, list_type, val, val_type) \
+	{ val_type* ptr = NULL; TRY(list_append(&list, sizeof(list_type), &ptr)); *ptr = val; }
+#define LIST_APPEND(list, type, val) LIST_APPEND2(list, type, val, type)
+
+#define LIST_POP(target, list, type) { target = LIST_GET_LAST(list, type); TRY(list_drop(&list, sizeof(type))); }
 
 #ifdef IMPL_COMMON
 
@@ -69,13 +91,24 @@ error_code list_append(list* list, size_t element_size, void** _ptr)
 	if (*_ptr) return EX_OUTARG_NOT_NULL;
 
 	if (list->count >= list->capacity)
-	{
-		error_code e = list_resize(list, element_size, list->capacity + 1);
-		if (e) return e;
-	}
+		TRY(list_resize(list, element_size, list->capacity + 1));
 
 	*_ptr = (byte*)list->ptr + (element_size * list->count++);
 	return SUCCESS;
+}
+
+error_code list_drop(list* list, size_t element_size)
+{
+	if (!list) return EX_NULL;
+	memset((byte*)list->ptr + (element_size * --(list->count)), 0, element_size);
+	return SUCCESS;
+}
+
+error_code list_clear(list* list, size_t element_size)
+{
+	if (!list) return EX_NULL;
+	memset(list->ptr, 0, list->capacity * element_size);
+	list->count = 0;
 }
 
 error_code list_release(list* list, void** _ptr, size_t* _capacity, size_t* _count)
@@ -95,6 +128,7 @@ error_code list_free(list* list)
 {
 	if (!list) return EX_NULL;
 	free(list->ptr);
+	list->ptr = NULL;
 	list->capacity = 0;
 	list->count = 0;
 	return SUCCESS;
